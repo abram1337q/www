@@ -77,7 +77,6 @@ export function InteractiveMap({
       maxBounds: RUSSIA_BOUNDS,
       minZoom: 2.5,
       maxZoom: 20,
-      antialias: true,
     });
 
     const currentMap = map.current;
