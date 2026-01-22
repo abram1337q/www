@@ -85,8 +85,7 @@ export function InteractiveMap({
     currentMap.addControl(new maplibregl.ScaleControl({ maxWidth: 200, unit: 'metric' }), 'bottom-left');
     currentMap.addControl(new maplibregl.GeolocateControl({
       positionOptions: { enableHighAccuracy: true },
-      trackUserLocation: true,
-      showUserHeading: true
+      trackUserLocation: true
     }), 'top-right');
 
     currentMap.on('load', async () => {
