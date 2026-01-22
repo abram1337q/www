@@ -1,0 +1,174 @@
+// Схема базы данных для проекта "След на Земле"
+// Версия: 1.0
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Категории историй (смайлы)
+enum StoryCategory {
+  LOVE_FAMILY      // ❤️ Любовь и семья
+  HEROISM          // 🎖️ Подвиг и служение
+  WORK_PROFESSION  // 🛠️ Труд и профессия
+  LIFE_WISDOM      // 📖 Жизнь и мудрость
+  MEMORY           // 🕯️ Память (об умершем)
+}
+
+// Статус истории
+enum StoryStatus {
+  PENDING_PAYMENT  // Ожидает оплаты
+  ON_MODERATION    // На модерации
+  APPROVED         // Одобрено
+  REJECTED         // Отклонено
+  DELETED          // Удалено
+}
+
+// Модель истории
+model Story {
+  id                String        @id @default(cuid())
+
+  // Информация об авторе
+  authorName        String        @default("Аноним") @map("author_name")
+  authorBirthDate   DateTime?     @map("author_birth_date")
+  authorBio         String?       @map("author_bio") @db.VarChar(200)
+  authorPhotoUrl    String?       @map("author_photo_url")
+
+  // Контактные данные
+  email             String
+
+  // Категория и контент
+  category          StoryCategory
+  title             String?       @db.VarChar(200)
+  content           String        @db.Text
+
+  // Геолокация
+  latitude          Float
+  longitude         Float
+  regionId          String?       @map("region_id")
+  regionName        String?       @map("region_name")
+  settlementName    String?       @map("settlement_name")
+  address           String?
+
+  // Статус и модерация
+  status            StoryStatus   @default(PENDING_PAYMENT)
+  rejectionReason   String?       @map("rejection_reason")
+  moderatedAt       DateTime?     @map("moderated_at")
+  moderatedBy       String?       @map("moderated_by")
+
+  // Токен для личного кабинета (64 символа)
+  cabinetToken      String        @unique @map("cabinet_token")
+
+  // Счётчик сердечек
+  heartsCount       Int           @default(0) @map("hearts_count")
+
+  // Связи
+  images            StoryImage[]
+  payment           Payment?
+  logs              ActivityLog[]
+
+  // Временные метки
+  createdAt         DateTime      @default(now()) @map("created_at")
+  updatedAt         DateTime      @updatedAt @map("updated_at")
+  deletedAt         DateTime?     @map("deleted_at")
+
+  @@map("stories")
+  @@index([status])
+  @@index([latitude, longitude])
+  @@index([regionId])
+  @@index([cabinetToken])
+}
+
+// Изображения в историях
+model StoryImage {
+  id          String   @id @default(cuid())
+  storyId     String   @map("story_id")
+  story       Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  url         String
+  position    Int      @default(0)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("story_images")
+  @@index([storyId])
+}
+
+// Платежи
+model Payment {
+  id              String   @id @default(cuid())
+  storyId         String   @unique @map("story_id")
+  story           Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  // Данные ЮKassa
+  yookassaId      String?  @unique @map("yookassa_id")
+  amount          Int      @default(990)
+  currency        String   @default("RUB")
+  status          String   @default("pending")
+
+  // Метаданные
+  payerIp         String?  @map("payer_ip")
+  payerEmail      String?  @map("payer_email")
+
+  // Временные метки
+  createdAt       DateTime @default(now()) @map("created_at")
+  paidAt          DateTime? @map("paid_at")
+
+  @@map("payments")
+  @@index([yookassaId])
+}
+
+// Администраторы
+model Admin {
+  id            String        @id @default(cuid())
+  email         String        @unique
+  passwordHash  String        @map("password_hash")
+  name          String
+  isActive      Boolean       @default(true) @map("is_active")
+
+  logs          ActivityLog[]
+
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  @@map("admins")
+}
+
+// Логи действий
+model ActivityLog {
+  id          String   @id @default(cuid())
+
+  // Что произошло
+  action      String
+  details     String?  @db.Text
+
+  // Связи
+  storyId     String?  @map("story_id")
+  story       Story?   @relation(fields: [storyId], references: [id], onDelete: SetNull)
+  adminId     String?  @map("admin_id")
+  admin       Admin?   @relation(fields: [adminId], references: [id], onDelete: SetNull)
+
+  // Метаданные
+  ipAddress   String?  @map("ip_address")
+  userAgent   String?  @map("user_agent")
+
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("activity_logs")
+  @@index([storyId])
+  @@index([adminId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+// Настройки системы
+model SystemSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("system_settings")
+}
