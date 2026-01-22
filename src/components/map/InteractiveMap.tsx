@@ -97,7 +97,7 @@ export function InteractiveMap({
       const layers = currentMap.getStyle().layers || [];
       let labelLayerId: string | undefined;
       for (const layer of layers) {
-        if (layer.type === 'symbol' && (layer as any).layout?.['text-field']) {
+        if (layer.type === 'symbol' && (layer as maplibregl.SymbolLayerSpecification).layout?.['text-field']) {
           labelLayerId = layer.id;
           break;
         }
