@@ -56,7 +56,13 @@ export async function POST(
     }
 
     // Выполняем возврат через ЮKassa
-    const refundResult = await refundPayment(payment.paymentId);
+    if (!payment.yookassaId) {
+      return NextResponse.json(
+        { success: false, error: 'ID платежа ЮKassa не найден' },
+        { status: 400 }
+      );
+    }
+    const refundResult = await refundPayment(payment.yookassaId);
 
     if (!refundResult.success) {
       return NextResponse.json(
