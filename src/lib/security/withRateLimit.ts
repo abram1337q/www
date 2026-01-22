@@ -1,7 +1,6 @@
 // Хелпер для применения rate limiting к API routes
 import { NextRequest, NextResponse } from 'next/server';
-import { checkRateLimit, getClientIP, createRateLimitKey, type RateLimitResult } from './rateLimit';
-import type { RateLimitConfig } from './rateLimit';
+import { checkRateLimit, getClientIP, createRateLimitKey } from './rateLimit';
 
 interface RateLimitOptions {
   config: { windowMs: number; maxRequests: number };
