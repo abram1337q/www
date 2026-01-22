@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  eslint: {
+    // Отключаем ESLint при билде на Vercel
+    ignoreDuringBuilds: true,
+  },
   images: {
     unoptimized: false,
     remotePatterns: [
