@@ -36,11 +36,7 @@ export async function POST(
     const story = await prisma.story.findUnique({
       where: { id },
       include: {
-        payments: {
-          where: { status: 'SUCCEEDED' },
-          orderBy: { createdAt: 'desc' },
-          take: 1,
-        },
+        payment: true,
       },
     });
 
@@ -51,8 +47,8 @@ export async function POST(
       );
     }
 
-    const payment = story.payments[0];
-    if (!payment) {
+    const payment = story.payment;
+    if (!payment || payment.status !== 'SUCCEEDED') {
       return NextResponse.json(
         { success: false, error: 'Платёж не найден' },
         { status: 404 }
