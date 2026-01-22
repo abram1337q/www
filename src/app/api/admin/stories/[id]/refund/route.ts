@@ -81,9 +81,8 @@ export async function POST(
     await prisma.activityLog.create({
       data: {
         action: 'REFUND_PAYMENT',
-        entityType: 'STORY',
-        entityId: id,
-        details: `Возврат платежа ${payment.paymentId} на сумму ${payment.amount / 100} руб.`,
+        storyId: id,
+        details: `Возврат платежа ${payment.yookassaId} на сумму ${payment.amount / 100} руб.`,
       },
     });
 
