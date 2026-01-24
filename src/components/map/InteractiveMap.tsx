@@ -107,80 +107,103 @@ export function InteractiveMap({
         const response = await fetch('https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/russia.geojson');
         russiaGeoJSON = await response.json();
 
-        // Создаём маску для скрытия других стран
-        if (russiaGeoJSON && russiaGeoJSON.features) {
-          // Создаём 4 полигона вокруг России (чтобы избежать проблем с holes и антимеридианом)
-          // Приблизительные границы России: lat 41-82, lng 19-180 (и -180 до -169 для Чукотки)
+        // Загружаем GeoJSON всех стран мира и скрываем всё кроме России
+        const countriesResponse = await fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson');
+        const countriesGeoJSON: GeoJSON.FeatureCollection = await countriesResponse.json();
 
-          const maskPolygons: GeoJSON.Feature[] = [
-            // Полигон снизу (южнее России) - Азия, Африка, Австралия
-            {
-              type: 'Feature',
-              properties: {},
-              geometry: {
-                type: 'Polygon',
-                coordinates: [[
-                  [-180, -90], [180, -90], [180, 41], [-180, 41], [-180, -90]
-                ]]
-              }
-            },
-            // Полигон слева (западнее России) - Западная Европа, Атлантика
-            {
-              type: 'Feature',
-              properties: {},
-              geometry: {
-                type: 'Polygon',
-                coordinates: [[
-                  [-180, 41], [19, 41], [19, 82], [-180, 82], [-180, 41]
-                ]]
-              }
-            },
-            // Полигон сверху (севернее России) - Арктика
-            {
-              type: 'Feature',
-              properties: {},
-              geometry: {
-                type: 'Polygon',
-                coordinates: [[
-                  [-180, 82], [180, 82], [180, 90], [-180, 90], [-180, 82]
-                ]]
-              }
-            },
-            // Полигон справа (восточнее России, Тихий океан) - между Чукоткой и Аляской
-            {
-              type: 'Feature',
-              properties: {},
-              geometry: {
-                type: 'Polygon',
-                coordinates: [[
-                  [-169, 41], [-169, 82], [-180, 82], [-180, 41], [-169, 41]
-                ]]
+        // Фильтруем - оставляем все страны КРОМЕ России
+        const nonRussiaCountries: GeoJSON.FeatureCollection = {
+          type: 'FeatureCollection',
+          features: countriesGeoJSON.features.filter(feature => {
+            const name = feature.properties?.ADMIN || feature.properties?.name || '';
+            const iso = feature.properties?.ISO_A3 || feature.properties?.ISO_A2 || '';
+            return name !== 'Russia' && iso !== 'RUS' && iso !== 'RU';
+          })
+        };
+
+        currentMap.addSource('non-russia-countries', {
+          type: 'geojson',
+          data: nonRussiaCountries
+        });
+
+        // Заливаем все страны кроме России серым цветом
+        currentMap.addLayer({
+          id: 'non-russia-fill',
+          type: 'fill',
+          source: 'non-russia-countries',
+          paint: {
+            'fill-color': '#d4d4d4',
+            'fill-opacity': 0.95
+          }
+        });
+
+        // Добавляем тонкую границу для отделения
+        currentMap.addLayer({
+          id: 'non-russia-border',
+          type: 'line',
+          source: 'non-russia-countries',
+          paint: {
+            'line-color': '#a3a3a3',
+            'line-width': 0.5,
+            'line-opacity': 0.5
+          }
+        });
+
+        // Скрываем надписи городов и регионов соседних стран
+        // Получаем все слои стиля и скрываем надписи вне России
+        const allLayers = currentMap.getStyle().layers || [];
+        for (const layer of allLayers) {
+          // Ищем слои с надписями стран/регионов/городов
+          if (layer.type === 'symbol' && layer.id) {
+            const layerId = layer.id.toLowerCase();
+            // Скрываем слои с названиями стран (кроме России)
+            if (layerId.includes('country') || layerId.includes('state') || layerId.includes('capital')) {
+              // Добавляем фильтр чтобы показывать только Россию
+              try {
+                currentMap.setFilter(layer.id, [
+                  'any',
+                  ['==', ['get', 'name'], 'Россия'],
+                  ['==', ['get', 'name'], 'Russia'],
+                  ['==', ['get', 'name:ru'], 'Россия'],
+                  ['==', ['get', 'iso_a2'], 'RU'],
+                  // Показываем российские города
+                  ['all',
+                    ['has', 'name'],
+                    ['!', ['in', ['get', 'name'], ['literal', [
+                      'Mongolia', 'Монголия', 'Kazakhstan', 'Казахстан', 'Қазақстан',
+                      'Ukraine', 'Украина', 'Україна', 'Belarus', 'Беларусь',
+                      'Finland', 'Финляндия', 'Suomi', 'Estonia', 'Эстония',
+                      'Latvia', 'Латвия', 'Lithuania', 'Литва',
+                      'Poland', 'Польша', 'Georgia', 'Грузия', 'საქართველო',
+                      'Azerbaijan', 'Азербайджан', 'China', 'Китай', '中国',
+                      'North Korea', 'КНДР', 'Japan', 'Япония', '日本',
+                      'Norway', 'Норвегия', 'Sverige', 'Sweden', 'Швеция',
+                      'Ulaanbaatar', 'Улан-Батор', 'Улаанбаатар',
+                      'Astana', 'Астана', 'Nur-Sultan',
+                      'Kyiv', 'Kiev', 'Київ', 'Киев',
+                      'Minsk', 'Минск', 'Мінск',
+                      'Helsinki', 'Хельсинки', 'Tallinn', 'Таллин',
+                      'Riga', 'Рига', 'Vilnius', 'Вильнюс',
+                      'Warsaw', 'Варшава', 'Tbilisi', 'Тбилиси',
+                      'Baku', 'Баку', 'Beijing', 'Пекин', '北京',
+                      'Pyongyang', 'Пхеньян', 'Tokyo', 'Токио', '東京',
+                      'Oslo', 'Осло', 'Stockholm', 'Стокгольм',
+                      'Bishkek', 'Бишкек', 'Dushanbe', 'Душанбе',
+                      'Tashkent', 'Ташкент', 'Ashgabat', 'Ашхабад',
+                      'Kabul', 'Кабул', 'Tehran', 'Тегеран',
+                      'Ankara', 'Анкара', 'Baghdad', 'Багдад'
+                    ]]]]
+                  ]
+                ]);
+              } catch {
+                // Фильтр не применился - игнорируем
               }
             }
-          ];
-
-          const maskGeoJSON: GeoJSON.FeatureCollection = {
-            type: 'FeatureCollection',
-            features: maskPolygons
-          };
-
-          currentMap.addSource('world-mask', {
-            type: 'geojson',
-            data: maskGeoJSON
-          });
-
-          currentMap.addLayer({
-            id: 'world-mask-fill',
-            type: 'fill',
-            source: 'world-mask',
-            paint: {
-              'fill-color': '#e8e8e8',
-              'fill-opacity': 0.92
-            }
-          });
+          }
         }
+
       } catch (error) {
-        console.error('Ошибка загрузки GeoJSON России для маски:', error);
+        console.error('Ошибка загрузки GeoJSON для маски:', error);
       }
 
       currentMap.addLayer({
