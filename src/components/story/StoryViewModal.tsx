@@ -6,7 +6,7 @@
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import { Heart, X, Calendar, MapPin, User } from 'lucide-react';
+import { Heart, Calendar, MapPin } from 'lucide-react';
 import Cookies from 'js-cookie';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
@@ -135,13 +135,6 @@ export function StoryViewModal({ isOpen, onClose, story, onHeart }: StoryViewMod
               )}
             </div>
 
-            {/* Кнопка закрытия */}
-            <button
-              onClick={onClose}
-              className="absolute top-4 right-4 sm:top-5 sm:right-5 p-2 rounded-full bg-white/80 hover:bg-white shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105"
-            >
-              <X className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-500" />
-            </button>
           </div>
         </div>
 
