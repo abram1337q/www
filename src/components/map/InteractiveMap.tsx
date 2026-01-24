@@ -108,57 +108,74 @@ export function InteractiveMap({
         russiaGeoJSON = await response.json();
 
         // Создаём маску для скрытия других стран
-        // Большой полигон (весь мир) с вырезом для России
         if (russiaGeoJSON && russiaGeoJSON.features) {
-          // Собираем все координаты России в один массив полигонов
-          const russiaHoles: number[][][] = [];
-          for (const feature of russiaGeoJSON.features) {
-            if (feature.geometry.type === 'Polygon') {
-              // Берём только внешний контур полигона (первый массив координат)
-              russiaHoles.push((feature.geometry.coordinates as number[][][])[0]);
-            } else if (feature.geometry.type === 'MultiPolygon') {
-              for (const polygon of feature.geometry.coordinates as number[][][][]) {
-                russiaHoles.push(polygon[0]);
-              }
-            }
-          }
+          // Создаём 4 полигона вокруг России (чтобы избежать проблем с holes и антимеридианом)
+          // Приблизительные границы России: lat 41-82, lng 19-180 (и -180 до -169 для Чукотки)
 
-          // Внешний полигон (весь мир)
-          const worldPolygon: number[][] = [
-            [-180, -90],
-            [180, -90],
-            [180, 90],
-            [-180, 90],
-            [-180, -90]
-          ];
-
-          // Создаём GeoJSON с маской (мир минус Россия)
-          const maskGeoJSON: GeoJSON.FeatureCollection = {
-            type: 'FeatureCollection',
-            features: [{
+          const maskPolygons: GeoJSON.Feature[] = [
+            // Полигон снизу (южнее России) - Азия, Африка, Австралия
+            {
               type: 'Feature',
               properties: {},
               geometry: {
                 type: 'Polygon',
-                coordinates: [worldPolygon, ...russiaHoles]
+                coordinates: [[
+                  [-180, -90], [180, -90], [180, 41], [-180, 41], [-180, -90]
+                ]]
               }
-            }]
+            },
+            // Полигон слева (западнее России) - Западная Европа, Атлантика
+            {
+              type: 'Feature',
+              properties: {},
+              geometry: {
+                type: 'Polygon',
+                coordinates: [[
+                  [-180, 41], [19, 41], [19, 82], [-180, 82], [-180, 41]
+                ]]
+              }
+            },
+            // Полигон сверху (севернее России) - Арктика
+            {
+              type: 'Feature',
+              properties: {},
+              geometry: {
+                type: 'Polygon',
+                coordinates: [[
+                  [-180, 82], [180, 82], [180, 90], [-180, 90], [-180, 82]
+                ]]
+              }
+            },
+            // Полигон справа (восточнее России, Тихий океан) - между Чукоткой и Аляской
+            {
+              type: 'Feature',
+              properties: {},
+              geometry: {
+                type: 'Polygon',
+                coordinates: [[
+                  [-169, 41], [-169, 82], [-180, 82], [-180, 41], [-169, 41]
+                ]]
+              }
+            }
+          ];
+
+          const maskGeoJSON: GeoJSON.FeatureCollection = {
+            type: 'FeatureCollection',
+            features: maskPolygons
           };
 
-          // Добавляем источник маски
           currentMap.addSource('world-mask', {
             type: 'geojson',
             data: maskGeoJSON
           });
 
-          // Добавляем слой маски - скрывает всё, кроме России
           currentMap.addLayer({
             id: 'world-mask-fill',
             type: 'fill',
             source: 'world-mask',
             paint: {
-              'fill-color': '#f5f5f5', // Светло-серый цвет для скрытия
-              'fill-opacity': 0.95
+              'fill-color': '#e8e8e8',
+              'fill-opacity': 0.92
             }
           });
         }
