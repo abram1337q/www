@@ -196,35 +196,35 @@ export function CreateStoryModal({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-        <DialogContent className="max-w-2xl max-h-[90vh] sm:max-h-[85vh] overflow-y-auto bg-white p-0">
+        <DialogContent className="w-full max-w-full sm:max-w-2xl max-h-[85vh] sm:max-h-[85vh] overflow-y-auto overflow-x-hidden bg-white p-0">
           {/* Header с градиентом */}
-          <div className="sticky top-0 z-10 bg-gradient-to-b from-white via-white to-white/95 backdrop-blur-sm px-5 sm:px-8 pt-6 pb-4 border-b border-zinc-100">
+          <div className="sticky top-0 z-10 bg-gradient-to-b from-white via-white to-white/95 backdrop-blur-sm px-4 sm:px-8 pt-5 sm:pt-6 pb-4 border-b border-zinc-100">
             <DialogHeader>
-              <DialogTitle className="text-xl sm:text-2xl font-bold text-zinc-900 pr-8">
+              <DialogTitle className="text-lg sm:text-2xl font-bold text-zinc-900 pr-10 break-words">
                 Расскажите свою историю
               </DialogTitle>
             </DialogHeader>
           </div>
 
-          <div className="space-y-6 sm:space-y-8 px-5 sm:px-8 py-6">
+          <div className="space-y-5 sm:space-y-8 px-4 sm:px-8 py-5 sm:py-6">
             {/* Местоположение */}
-            <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl p-4 sm:p-5 border border-amber-100/80 shadow-sm">
-              <div className="flex items-center gap-3 sm:gap-4">
-                <div className="w-11 h-11 sm:w-12 sm:h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-orange-200/50">
+            <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl p-3 sm:p-5 border border-amber-100/80 shadow-sm">
+              <div className="flex items-start gap-3 sm:gap-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-orange-200/50">
                   <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                 </div>
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 overflow-hidden">
                   <div className="text-xs text-amber-600/80 font-semibold uppercase tracking-wider">Местоположение</div>
                   {locationLoading ? (
                     <div className="flex items-center gap-2 text-zinc-500 mt-1">
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <Loader2 className="w-4 h-4 animate-spin flex-shrink-0" />
                       <span className="text-sm">Определение...</span>
                     </div>
                   ) : (
-                    <div className="text-sm sm:text-base font-medium text-zinc-800 truncate mt-0.5">
+                    <div className="text-sm sm:text-base font-medium text-zinc-800 mt-0.5 break-words line-clamp-2">
                       {locationName || 'Россия'}
                     </div>
                   )}
@@ -233,17 +233,17 @@ export function CreateStoryModal({
             </div>
 
             {/* Блок 1: Информация об авторе */}
-            <div className="space-y-4 sm:space-y-5">
-              <h3 className="text-base sm:text-lg font-semibold text-zinc-800 flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-zinc-100 flex items-center justify-center">
-                  <User className="w-4 h-4 text-zinc-600" />
+            <div className="space-y-3 sm:space-y-5">
+              <h3 className="text-base sm:text-lg font-semibold text-zinc-800 flex items-center gap-2 sm:gap-2.5">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-zinc-100 flex items-center justify-center flex-shrink-0">
+                  <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-zinc-600" />
                 </div>
-                Информация об авторе
+                <span>Информация об авторе</span>
               </h3>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 {/* Имя */}
-                <div className="space-y-2">
+                <div className="space-y-1.5 sm:space-y-2">
                   <Label htmlFor="authorName" className="text-sm font-medium text-zinc-700">Ваше имя</Label>
                   <Input
                     id="authorName"
@@ -251,31 +251,31 @@ export function CreateStoryModal({
                     maxLength={50}
                     value={formData.authorName}
                     onChange={(e) => setFormData(prev => ({ ...prev, authorName: e.target.value }))}
-                    className="h-11 sm:h-12 rounded-xl border-zinc-200 focus:border-amber-400 focus:ring-amber-400/20 transition-all"
+                    className="h-10 sm:h-12 rounded-xl border-zinc-200 focus:border-amber-400 focus:ring-amber-400/20 transition-all text-base"
                   />
                 </div>
 
                 {/* Дата рождения */}
-                <div className="space-y-2">
+                <div className="space-y-1.5 sm:space-y-2">
                   <Label htmlFor="birthDate" className="flex items-center gap-2 text-sm font-medium text-zinc-700">
-                    <Calendar className="w-4 h-4 text-zinc-500" />
-                    Дата рождения
+                    <Calendar className="w-4 h-4 text-zinc-500 flex-shrink-0" />
+                    <span>Дата рождения</span>
                   </Label>
                   <Input
                     id="birthDate"
                     type="date"
                     value={formData.authorBirthDate}
                     onChange={(e) => setFormData(prev => ({ ...prev, authorBirthDate: e.target.value }))}
-                    className="h-11 sm:h-12 rounded-xl border-zinc-200 focus:border-amber-400 focus:ring-amber-400/20 transition-all"
+                    className="h-10 sm:h-12 rounded-xl border-zinc-200 focus:border-amber-400 focus:ring-amber-400/20 transition-all text-base"
                   />
                 </div>
               </div>
 
               {/* Краткая биография */}
-              <div className="space-y-2">
-                <Label htmlFor="bio" className="text-sm font-medium text-zinc-700">
-                  Краткая биография
-                  <span className="text-zinc-400 ml-2 font-normal">
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label htmlFor="bio" className="text-sm font-medium text-zinc-700 flex flex-wrap items-center gap-x-2">
+                  <span>Краткая биография</span>
+                  <span className="text-zinc-400 font-normal">
                     {formData.authorBio.length}/200
                   </span>
                 </Label>
@@ -286,19 +286,19 @@ export function CreateStoryModal({
                   rows={2}
                   value={formData.authorBio}
                   onChange={(e) => setFormData(prev => ({ ...prev, authorBio: e.target.value }))}
-                  className="rounded-xl border-zinc-200 focus:border-amber-400 focus:ring-amber-400/20 resize-none transition-all"
+                  className="rounded-xl border-zinc-200 focus:border-amber-400 focus:ring-amber-400/20 resize-none transition-all text-base"
                 />
               </div>
 
               {/* Фото автора */}
-              <div className="space-y-2">
+              <div className="space-y-1.5 sm:space-y-2">
                 <Label className="text-sm font-medium text-zinc-700">Фото автора</Label>
                 {authorPhotoPreview ? (
                   <div className="relative inline-block">
                     <img
                       src={authorPhotoPreview}
                       alt="Фото автора"
-                      className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border-2 border-zinc-200 shadow-md"
+                      className="w-18 h-18 sm:w-24 sm:h-24 rounded-xl sm:rounded-2xl object-cover border-2 border-zinc-200 shadow-md"
                     />
                     <button
                       type="button"
@@ -311,13 +311,13 @@ export function CreateStoryModal({
                 ) : (
                   <div
                     {...getAuthorPhotoRootProps()}
-                    className="border-2 border-dashed border-zinc-200 rounded-2xl p-5 text-center cursor-pointer hover:border-amber-400 hover:bg-amber-50/50 transition-all group"
+                    className="border-2 border-dashed border-zinc-200 rounded-xl sm:rounded-2xl p-4 sm:p-5 text-center cursor-pointer hover:border-amber-400 hover:bg-amber-50/50 transition-all group"
                   >
                     <input {...getAuthorPhotoInputProps()} />
-                    <div className="w-12 h-12 mx-auto bg-zinc-100 rounded-xl flex items-center justify-center mb-3 group-hover:bg-amber-100 transition-colors">
-                      <Upload className="w-6 h-6 text-zinc-400 group-hover:text-amber-600 transition-colors" />
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 mx-auto bg-zinc-100 rounded-lg sm:rounded-xl flex items-center justify-center mb-2 sm:mb-3 group-hover:bg-amber-100 transition-colors">
+                      <Upload className="w-5 h-5 sm:w-6 sm:h-6 text-zinc-400 group-hover:text-amber-600 transition-colors" />
                     </div>
-                    <p className="text-sm text-zinc-600 font-medium">
+                    <p className="text-xs sm:text-sm text-zinc-600 font-medium">
                       Перетащите фото или нажмите для выбора
                     </p>
                     <p className="text-xs text-zinc-400 mt-1">
@@ -329,19 +329,19 @@ export function CreateStoryModal({
             </div>
 
             {/* Блок 2: Выбор категории */}
-            <div className="space-y-4 sm:space-y-5">
+            <div className="space-y-3 sm:space-y-5">
               <h3 className="text-base sm:text-lg font-semibold text-zinc-800">Категория истории</h3>
 
               <RadioGroup
                 value={formData.category}
                 onValueChange={(value) => setFormData(prev => ({ ...prev, category: value as StoryCategoryId }))}
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
+                className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3"
               >
                 {Object.values(STORY_CATEGORIES).map((cat) => (
                   <label
                     key={cat.id}
                     className={`
-                      relative flex items-center gap-3 p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200
+                      relative flex items-center gap-2.5 sm:gap-3 p-3 sm:p-4 rounded-xl sm:rounded-2xl border-2 cursor-pointer transition-all duration-200
                       ${formData.category === cat.id
                         ? 'border-amber-500 bg-gradient-to-br from-amber-50 to-orange-50 shadow-lg shadow-amber-100/50 scale-[1.02]'
                         : 'border-zinc-200 hover:border-amber-300 hover:bg-amber-50/30 hover:shadow-md'
@@ -349,14 +349,14 @@ export function CreateStoryModal({
                     `}
                   >
                     <RadioGroupItem value={cat.id} id={cat.id} className="sr-only" />
-                    <span className="text-2xl">{cat.emoji}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-semibold text-zinc-900 text-sm sm:text-base">{cat.label}</div>
+                    <span className="text-xl sm:text-2xl flex-shrink-0">{cat.emoji}</span>
+                    <div className="flex-1 min-w-0 overflow-hidden">
+                      <div className="font-semibold text-zinc-900 text-sm">{cat.label}</div>
                       <div className="text-xs text-zinc-500 truncate">{cat.description}</div>
                     </div>
                     {formData.category === cat.id && (
-                      <div className="absolute top-2.5 right-2.5 w-6 h-6 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-md">
-                        <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <div className="absolute top-2 right-2 sm:top-2.5 sm:right-2.5 w-5 h-5 sm:w-6 sm:h-6 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-md">
+                        <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                         </svg>
                       </div>
@@ -367,17 +367,17 @@ export function CreateStoryModal({
             </div>
 
             {/* Блок 3: Текст истории */}
-            <div className="space-y-4 sm:space-y-5">
+            <div className="space-y-3 sm:space-y-5">
               <div>
-                <h3 className="text-base sm:text-lg font-semibold text-zinc-800 mb-2">Ваша история</h3>
-                <p className="text-sm text-zinc-500 leading-relaxed">
+                <h3 className="text-base sm:text-lg font-semibold text-zinc-800 mb-1.5 sm:mb-2">Ваша история</h3>
+                <p className="text-xs sm:text-sm text-zinc-500 leading-relaxed">
                   Расскажите свою историю: о подвиге, любви, интересной жизни, заслуге,
                   памяти о близком или просто о том, что важно для вас.
                 </p>
               </div>
 
               {/* Заголовок истории */}
-              <div className="space-y-2">
+              <div className="space-y-1.5 sm:space-y-2">
                 <Label htmlFor="title" className="text-sm font-medium text-zinc-700">Заголовок истории</Label>
                 <Input
                   id="title"
@@ -385,7 +385,7 @@ export function CreateStoryModal({
                   maxLength={100}
                   value={formData.title}
                   onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                  className="h-12 sm:h-14 rounded-xl border-zinc-200 focus:border-amber-400 focus:ring-amber-400/20 text-base sm:text-lg font-medium transition-all"
+                  className="h-11 sm:h-14 rounded-xl border-zinc-200 focus:border-amber-400 focus:ring-amber-400/20 text-base font-medium transition-all"
                 />
               </div>
 
@@ -395,38 +395,38 @@ export function CreateStoryModal({
               />
 
               {/* Загрузка изображений */}
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 <Label className="flex items-center gap-2 text-sm font-medium text-zinc-700">
-                  <ImageIcon className="w-4 h-4 text-zinc-500" />
-                  Изображения ({formData.images.length}/10)
+                  <ImageIcon className="w-4 h-4 text-zinc-500 flex-shrink-0" />
+                  <span>Изображения ({formData.images.length}/10)</span>
                 </Label>
 
                 <div
                   {...getImagesRootProps()}
-                  className="border-2 border-dashed border-zinc-200 rounded-2xl p-4 text-center cursor-pointer hover:border-amber-400 hover:bg-amber-50/50 transition-all group"
+                  className="border-2 border-dashed border-zinc-200 rounded-xl sm:rounded-2xl p-3 sm:p-4 text-center cursor-pointer hover:border-amber-400 hover:bg-amber-50/50 transition-all group"
                 >
                   <input {...getImagesInputProps()} />
-                  <div className="flex items-center justify-center gap-3">
-                    <div className="w-10 h-10 bg-zinc-100 rounded-xl flex items-center justify-center group-hover:bg-amber-100 transition-colors">
-                      <Upload className="w-5 h-5 text-zinc-400 group-hover:text-amber-600 transition-colors" />
+                  <div className="flex items-center justify-center gap-2 sm:gap-3">
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 bg-zinc-100 rounded-xl flex items-center justify-center group-hover:bg-amber-100 transition-colors flex-shrink-0">
+                      <Upload className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-400 group-hover:text-amber-600 transition-colors" />
                     </div>
                     <span className="text-sm text-zinc-600 font-medium">Добавить изображения</span>
                   </div>
                 </div>
 
                 {formData.images.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-3">
+                  <div className="flex flex-wrap gap-2 mt-2 sm:mt-3">
                     {formData.images.map((file, index) => (
                       <div key={index} className="relative group">
                         <img
                           src={URL.createObjectURL(file)}
                           alt={`Изображение ${index + 1}`}
-                          className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-xl border border-zinc-200 shadow-sm"
+                          className="w-14 h-14 sm:w-20 sm:h-20 object-cover rounded-lg sm:rounded-xl border border-zinc-200 shadow-sm"
                         />
                         <button
                           type="button"
                           onClick={() => removeImage(index)}
-                          className="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-all hover:scale-110 shadow-md"
+                          className="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full p-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all hover:scale-110 shadow-md"
                         >
                           <X className="w-3 h-3" />
                         </button>
@@ -442,15 +442,15 @@ export function CreateStoryModal({
             </div>
 
             {/* Блок 4: Контактные данные */}
-            <div className="space-y-4">
-              <h3 className="text-base sm:text-lg font-semibold text-zinc-800 flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-zinc-100 flex items-center justify-center">
-                  <Mail className="w-4 h-4 text-zinc-600" />
+            <div className="space-y-3 sm:space-y-4">
+              <h3 className="text-base sm:text-lg font-semibold text-zinc-800 flex items-center gap-2 sm:gap-2.5">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-zinc-100 flex items-center justify-center flex-shrink-0">
+                  <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-zinc-600" />
                 </div>
-                Контактные данные
+                <span>Контактные данные</span>
               </h3>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5 sm:space-y-2">
                 <Label htmlFor="email" className="text-sm font-medium text-zinc-700">
                   Email <span className="text-red-500">*</span>
                 </Label>
@@ -461,9 +461,9 @@ export function CreateStoryModal({
                   required
                   value={formData.email}
                   onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  className="h-11 sm:h-12 rounded-xl border-zinc-200 focus:border-amber-400 focus:ring-amber-400/20 transition-all"
+                  className="h-10 sm:h-12 rounded-xl border-zinc-200 focus:border-amber-400 focus:ring-amber-400/20 transition-all text-base"
                 />
-                <p className="text-xs text-zinc-400">
+                <p className="text-xs text-zinc-400 leading-relaxed">
                   На этот адрес придёт секретная ссылка для управления историей
                 </p>
               </div>
@@ -471,27 +471,27 @@ export function CreateStoryModal({
           </div>
 
           {/* Фиксированный футер с кнопкой */}
-          <div className="sticky bottom-0 bg-gradient-to-t from-white via-white to-white/95 backdrop-blur-sm px-5 sm:px-8 py-5 border-t border-zinc-100">
+          <div className="sticky bottom-0 bg-gradient-to-t from-white via-white to-white/95 backdrop-blur-sm px-4 sm:px-8 py-4 sm:py-5 border-t border-zinc-100">
             <Button
               onClick={handleSubmit}
               disabled={!isFormValid || isSubmitting}
-              className="w-full h-12 sm:h-14 text-base sm:text-lg font-semibold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-xl shadow-orange-500/25 rounded-2xl transition-all duration-300 hover:shadow-orange-500/40 hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100"
+              className="w-full h-11 sm:h-14 text-sm sm:text-lg font-semibold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-xl shadow-orange-500/25 rounded-xl sm:rounded-2xl transition-all duration-300 hover:shadow-orange-500/40 hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100"
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  Отправка...
+                  <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 animate-spin" />
+                  <span>Отправка...</span>
                 </>
               ) : (
                 <>
-                  <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                   </svg>
-                  Опубликовать историю
+                  <span>Опубликовать историю</span>
                 </>
               )}
             </Button>
-            <p className="text-xs text-center text-zinc-400 mt-3">
+            <p className="text-xs text-center text-zinc-400 mt-2 sm:mt-3">
               Публикация истории — 990 ₽
             </p>
           </div>
