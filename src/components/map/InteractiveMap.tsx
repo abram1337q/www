@@ -101,46 +101,67 @@ export function InteractiveMap({
         }
       }
 
-      // Регионы России - загружаем для создания точной маски
+      // Регионы России - загружаем сначала для создания маски
       let russiaGeoJSON: GeoJSON.FeatureCollection | null = null;
       try {
         const response = await fetch('https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/russia.geojson');
         russiaGeoJSON = await response.json();
 
-        // Создаём точную маску - весь мир минус Россия
+        // Создаём маску для скрытия других стран
         if (russiaGeoJSON && russiaGeoJSON.features) {
-          // Функция для разворота координат (holes должны быть clockwise)
-          const reverseCoords = (coords: number[][]): number[][] => [...coords].reverse();
+          // Создаём 4 полигона вокруг России (чтобы избежать проблем с holes и антимеридианом)
+          // Приблизительные границы России: lat 41-82, lng 19-180 (и -180 до -169 для Чукотки)
 
-          // Собираем все контуры России как holes
-          const russiaHoles: number[][][] = [];
-          for (const feature of russiaGeoJSON.features) {
-            if (feature.geometry.type === 'Polygon') {
-              const coords = (feature.geometry.coordinates as number[][][])[0];
-              russiaHoles.push(reverseCoords(coords));
-            } else if (feature.geometry.type === 'MultiPolygon') {
-              for (const polygon of feature.geometry.coordinates as number[][][][]) {
-                russiaHoles.push(reverseCoords(polygon[0]));
-              }
-            }
-          }
-
-          // Внешний контур - весь мир (counter-clockwise)
-          const worldOuter: number[][] = [
-            [-180, -85], [180, -85], [180, 85], [-180, 85], [-180, -85]
-          ];
-
-          // Создаём GeoJSON с маской
-          const maskGeoJSON: GeoJSON.FeatureCollection = {
-            type: 'FeatureCollection',
-            features: [{
+          const maskPolygons: GeoJSON.Feature[] = [
+            // Полигон снизу (южнее России) - Азия, Африка, Австралия
+            {
               type: 'Feature',
               properties: {},
               geometry: {
                 type: 'Polygon',
-                coordinates: [worldOuter, ...russiaHoles]
+                coordinates: [[
+                  [-180, -90], [180, -90], [180, 41], [-180, 41], [-180, -90]
+                ]]
               }
-            }]
+            },
+            // Полигон слева (западнее России) - Западная Европа, Атлантика
+            {
+              type: 'Feature',
+              properties: {},
+              geometry: {
+                type: 'Polygon',
+                coordinates: [[
+                  [-180, 41], [19, 41], [19, 82], [-180, 82], [-180, 41]
+                ]]
+              }
+            },
+            // Полигон сверху (севернее России) - Арктика
+            {
+              type: 'Feature',
+              properties: {},
+              geometry: {
+                type: 'Polygon',
+                coordinates: [[
+                  [-180, 82], [180, 82], [180, 90], [-180, 90], [-180, 82]
+                ]]
+              }
+            },
+            // Полигон справа (восточнее России, Тихий океан) - между Чукоткой и Аляской
+            {
+              type: 'Feature',
+              properties: {},
+              geometry: {
+                type: 'Polygon',
+                coordinates: [[
+                  [-169, 41], [-169, 82], [-180, 82], [-180, 41], [-169, 41]
+                ]]
+              }
+            }
+          ];
+
+          const maskGeoJSON: GeoJSON.FeatureCollection = {
+            type: 'FeatureCollection',
+            features: maskPolygons
           };
 
           currentMap.addSource('world-mask', {
@@ -153,8 +174,8 @@ export function InteractiveMap({
             type: 'fill',
             source: 'world-mask',
             paint: {
-              'fill-color': '#e5e5e5',
-              'fill-opacity': 0.95
+              'fill-color': '#e8e8e8',
+              'fill-opacity': 0.92
             }
           });
         }
