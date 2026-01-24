@@ -60,12 +60,13 @@ function DialogContent({
         data-slot="dialog-content"
         className={cn(
           // Позиционирование
-          "fixed z-50 w-[calc(100%-2rem)] max-w-lg",
-          // Мобильная версия - снизу экрана
-          "bottom-0 left-1/2 -translate-x-1/2 translate-y-0",
+          "fixed z-50",
+          // Мобильная версия - полноэкранная снизу
+          "inset-x-0 bottom-0 w-full max-w-full",
           "rounded-t-3xl rounded-b-none",
-          // Десктоп - по центру
-          "sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2",
+          // Десктоп - по центру с ограниченной шириной
+          "sm:inset-auto sm:left-1/2 sm:top-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2",
+          "sm:w-[calc(100%-2rem)] sm:max-w-lg",
           "sm:rounded-3xl",
           // Стили
           "grid gap-4 border border-zinc-200/80 bg-white p-6 shadow-2xl shadow-black/10",
