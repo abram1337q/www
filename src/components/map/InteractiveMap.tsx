@@ -101,6 +101,71 @@ export function InteractiveMap({
         }
       }
 
+      // Регионы России - загружаем сначала для создания маски
+      let russiaGeoJSON: GeoJSON.FeatureCollection | null = null;
+      try {
+        const response = await fetch('https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/russia.geojson');
+        russiaGeoJSON = await response.json();
+
+        // Создаём маску для скрытия других стран
+        // Большой полигон (весь мир) с вырезом для России
+        if (russiaGeoJSON && russiaGeoJSON.features) {
+          // Собираем все координаты России в один массив полигонов
+          const russiaHoles: number[][][] = [];
+          for (const feature of russiaGeoJSON.features) {
+            if (feature.geometry.type === 'Polygon') {
+              // Берём только внешний контур полигона (первый массив координат)
+              russiaHoles.push((feature.geometry.coordinates as number[][][])[0]);
+            } else if (feature.geometry.type === 'MultiPolygon') {
+              for (const polygon of feature.geometry.coordinates as number[][][][]) {
+                russiaHoles.push(polygon[0]);
+              }
+            }
+          }
+
+          // Внешний полигон (весь мир)
+          const worldPolygon: number[][] = [
+            [-180, -90],
+            [180, -90],
+            [180, 90],
+            [-180, 90],
+            [-180, -90]
+          ];
+
+          // Создаём GeoJSON с маской (мир минус Россия)
+          const maskGeoJSON: GeoJSON.FeatureCollection = {
+            type: 'FeatureCollection',
+            features: [{
+              type: 'Feature',
+              properties: {},
+              geometry: {
+                type: 'Polygon',
+                coordinates: [worldPolygon, ...russiaHoles]
+              }
+            }]
+          };
+
+          // Добавляем источник маски
+          currentMap.addSource('world-mask', {
+            type: 'geojson',
+            data: maskGeoJSON
+          });
+
+          // Добавляем слой маски - скрывает всё, кроме России
+          currentMap.addLayer({
+            id: 'world-mask-fill',
+            type: 'fill',
+            source: 'world-mask',
+            paint: {
+              'fill-color': '#f5f5f5', // Светло-серый цвет для скрытия
+              'fill-opacity': 0.95
+            }
+          });
+        }
+      } catch (error) {
+        console.error('Ошибка загрузки GeoJSON России для маски:', error);
+      }
+
       currentMap.addLayer({
         id: 'buildings-3d',
         source: 'openmaptiles',
@@ -142,12 +207,15 @@ export function InteractiveMap({
         },
       });
 
-      // Регионы России
+      // Регионы России - добавляем слои поверх маски
       try {
-        const response = await fetch('https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/russia.geojson');
-        const russiaGeoJSON = await response.json();
+        if (!russiaGeoJSON) {
+          const resp = await fetch('https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/russia.geojson');
+          russiaGeoJSON = await resp.json();
+        }
 
-        currentMap.addSource('russia-regions', { type: 'geojson', data: russiaGeoJSON });
+        if (russiaGeoJSON) {
+          currentMap.addSource('russia-regions', { type: 'geojson', data: russiaGeoJSON });
 
         currentMap.addLayer({
           id: 'regions-fill',
@@ -214,6 +282,7 @@ export function InteractiveMap({
             }
           }
         });
+        }
       } catch (error) {
         console.error('Ошибка загрузки GeoJSON:', error);
       }
