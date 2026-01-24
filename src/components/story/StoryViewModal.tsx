@@ -83,48 +83,54 @@ export function StoryViewModal({ isOpen, onClose, story, onHeart }: StoryViewMod
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-2xl max-h-[90vh] p-0 overflow-hidden bg-white">
+      <DialogContent className="max-w-2xl max-h-[90vh] sm:max-h-[85vh] p-0 overflow-hidden bg-white">
         {/* Шапка с информацией об авторе */}
-        <div className="p-6 border-b border-zinc-100 bg-gradient-to-r from-amber-50/50 to-orange-50/50">
-          <div className="flex items-start gap-4">
+        <div className="relative p-5 sm:p-6 border-b border-zinc-100 bg-gradient-to-br from-amber-50/80 via-orange-50/50 to-white">
+          {/* Декоративный элемент */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-amber-100/50 to-transparent rounded-bl-full pointer-events-none" />
+
+          <div className="relative flex items-start gap-4">
             {/* Аватар */}
-            <Avatar className="w-16 h-16 border-3 border-amber-200 shadow-lg shadow-amber-100">
+            <Avatar className="w-14 h-14 sm:w-16 sm:h-16 border-[3px] border-white shadow-xl ring-2 ring-amber-100/50">
               <AvatarImage src={story.authorPhotoUrl || undefined} alt={story.authorName} />
-              <AvatarFallback className="bg-gradient-to-br from-amber-100 to-orange-100 text-amber-700 text-lg font-semibold">
+              <AvatarFallback className="bg-gradient-to-br from-amber-100 to-orange-100 text-amber-700 text-base sm:text-lg font-bold">
                 {getInitials(story.authorName)}
               </AvatarFallback>
             </Avatar>
 
             {/* Информация об авторе */}
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 pr-8">
               <div className="flex items-center gap-2 flex-wrap">
-                <h2 className="text-xl font-semibold text-zinc-900">
+                <h2 className="text-lg sm:text-xl font-bold text-zinc-900">
                   {story.authorName}
                 </h2>
-                <span className="text-2xl">{category.emoji}</span>
-                <Badge className="text-xs bg-amber-100 text-amber-700 border-amber-200">
-                  {category.label}
-                </Badge>
+                <span className="text-xl sm:text-2xl">{category.emoji}</span>
               </div>
 
+              <Badge className="mt-1.5 text-xs font-medium bg-gradient-to-r from-amber-100 to-orange-100 text-amber-700 border-amber-200/80 rounded-lg px-2.5 py-0.5">
+                {category.label}
+              </Badge>
+
               {story.authorBirthDate && (
-                <div className="flex items-center gap-1 text-sm text-zinc-500 mt-1">
-                  <Calendar className="w-4 h-4" />
+                <div className="flex items-center gap-1.5 text-sm text-zinc-500 mt-2">
+                  <Calendar className="w-3.5 h-3.5" />
                   {formatDate(story.authorBirthDate)}
                 </div>
               )}
 
               {story.authorBio && (
-                <p className="text-sm text-zinc-600 italic mt-2">
+                <p className="text-sm text-zinc-600 italic mt-2 line-clamp-2">
                   {story.authorBio}
                 </p>
               )}
 
               {story.settlementName && (
-                <div className="flex items-center gap-1 text-sm text-zinc-500 mt-2">
-                  <MapPin className="w-4 h-4" />
-                  {story.settlementName}
-                  {story.regionName && `, ${story.regionName}`}
+                <div className="flex items-center gap-1.5 text-sm text-zinc-500 mt-2">
+                  <MapPin className="w-3.5 h-3.5 text-amber-500" />
+                  <span className="truncate">
+                    {story.settlementName}
+                    {story.regionName && `, ${story.regionName}`}
+                  </span>
                 </div>
               )}
             </div>
@@ -132,36 +138,36 @@ export function StoryViewModal({ isOpen, onClose, story, onHeart }: StoryViewMod
             {/* Кнопка закрытия */}
             <button
               onClick={onClose}
-              className="p-2 rounded-full hover:bg-zinc-100 transition-colors"
+              className="absolute top-4 right-4 sm:top-5 sm:right-5 p-2 rounded-full bg-white/80 hover:bg-white shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105"
             >
-              <X className="w-5 h-5 text-zinc-500" />
+              <X className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-500" />
             </button>
           </div>
         </div>
 
         {/* Контент истории */}
-        <ScrollArea className="flex-1 max-h-[50vh]">
-          <div className="p-6">
+        <ScrollArea className="flex-1 max-h-[45vh] sm:max-h-[50vh]">
+          <div className="p-5 sm:p-6">
             {story.title && (
-              <h3 className="text-2xl font-semibold text-zinc-900 mb-4">
+              <h3 className="text-xl sm:text-2xl font-bold text-zinc-900 mb-4 leading-tight">
                 {story.title}
               </h3>
             )}
 
             <div
-              className="prose prose-zinc max-w-none"
+              className="prose prose-zinc prose-sm sm:prose-base max-w-none prose-headings:font-semibold prose-p:leading-relaxed prose-a:text-amber-600 prose-a:no-underline hover:prose-a:underline"
               dangerouslySetInnerHTML={{ __html: story.content }}
             />
 
             {/* Изображения */}
             {story.images && story.images.length > 0 && (
-              <div className="mt-6 grid grid-cols-2 gap-4">
+              <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-4">
                 {story.images.map((image) => (
                   <img
                     key={image.id}
                     src={image.url}
                     alt=""
-                    className="w-full rounded-lg object-cover"
+                    className="w-full rounded-2xl object-cover shadow-md hover:shadow-lg transition-shadow duration-200"
                   />
                 ))}
               </div>
@@ -170,33 +176,40 @@ export function StoryViewModal({ isOpen, onClose, story, onHeart }: StoryViewMod
         </ScrollArea>
 
         {/* Футер с сердечком */}
-        <div className="p-6 border-t border-zinc-100 bg-zinc-50">
-          <div className="flex items-center justify-between">
+        <div className="p-4 sm:p-5 border-t border-zinc-100 bg-gradient-to-t from-zinc-50 to-white">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
             <Button
               onClick={handleHeart}
               disabled={hasHearted}
               variant={hasHearted ? "secondary" : "default"}
               className={`
-                gap-2 transition-all duration-300
+                w-full sm:w-auto gap-2.5 h-11 sm:h-12 px-5 sm:px-6 rounded-2xl font-semibold transition-all duration-300
                 ${isHeartAnimating ? 'scale-110' : ''}
-                ${hasHearted ? 'bg-red-50 text-red-600 hover:bg-red-100 border-red-200' : ''}
+                ${hasHearted
+                  ? 'bg-gradient-to-r from-red-50 to-pink-50 text-red-600 hover:from-red-100 hover:to-pink-100 border-2 border-red-200/80 shadow-sm'
+                  : 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 hover:scale-[1.02]'
+                }
               `}
             >
               <Heart
-                className={`w-5 h-5 transition-all ${hasHearted ? 'fill-red-500 text-red-500' : ''}`}
+                className={`w-5 h-5 transition-all duration-300 ${hasHearted ? 'fill-red-500 text-red-500 scale-110' : ''}`}
               />
-              {hasHearted ? 'История тронула меня' : 'Эта история тронула меня'}
+              <span className="text-sm sm:text-base">
+                {hasHearted ? 'Тронуло' : 'Эта история тронула меня'}
+              </span>
             </Button>
 
-            <div className="text-sm text-zinc-600">
+            <div className="text-sm text-zinc-500 text-center sm:text-right">
               {heartsCount > 0 ? (
-                <>
-                  Эту историю отметил{heartsCount === 1 ? '' : 'и'}{' '}
-                  <span className="font-semibold text-zinc-900">{heartsCount}</span>{' '}
-                  {heartsCount === 1 ? 'человек' : heartsCount < 5 ? 'человека' : 'человек'}
-                </>
+                <span className="flex items-center gap-1.5 justify-center sm:justify-end">
+                  <Heart className="w-4 h-4 fill-red-400 text-red-400" />
+                  <span>
+                    <span className="font-semibold text-zinc-700">{heartsCount}</span>{' '}
+                    {heartsCount === 1 ? 'человек' : heartsCount < 5 ? 'человека' : 'человек'}
+                  </span>
+                </span>
               ) : (
-                'Будьте первым, кто отметит эту историю'
+                <span className="text-zinc-400">Будьте первым</span>
               )}
             </div>
           </div>
@@ -206,10 +219,12 @@ export function StoryViewModal({ isOpen, onClose, story, onHeart }: StoryViewMod
         <style jsx global>{`
           @keyframes heart-pulse {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.2); }
+            25% { transform: scale(1.2); }
+            50% { transform: scale(0.95); }
+            75% { transform: scale(1.1); }
           }
           .animate-heart-pulse {
-            animation: heart-pulse 0.3s ease-in-out;
+            animation: heart-pulse 0.4s ease-in-out;
           }
         `}</style>
       </DialogContent>
