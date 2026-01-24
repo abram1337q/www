@@ -37,7 +37,10 @@ function DialogOverlay({
     <DialogPrimitive.Overlay
       data-slot="dialog-overlay"
       className={cn(
-        "fixed inset-0 z-50 bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+        "fixed inset-0 z-50 bg-black/60 backdrop-blur-sm",
+        "data-[state=open]:animate-in data-[state=closed]:animate-out",
+        "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+        "transition-all duration-300",
         className
       )}
       {...props}
@@ -56,13 +59,50 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border border-zinc-200 bg-white p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-xl dark:border-zinc-800 dark:bg-zinc-950",
+          // Позиционирование
+          "fixed z-50 w-[calc(100%-2rem)] max-w-lg",
+          // Мобильная версия - снизу экрана
+          "bottom-0 left-1/2 -translate-x-1/2 translate-y-0",
+          "rounded-t-3xl rounded-b-none",
+          // Десктоп - по центру
+          "sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2",
+          "sm:rounded-3xl",
+          // Стили
+          "grid gap-4 border border-zinc-200/80 bg-white p-6 shadow-2xl shadow-black/10",
+          // Анимации
+          "duration-300 ease-out",
+          "data-[state=open]:animate-in data-[state=closed]:animate-out",
+          "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+          // Мобильная анимация - slide from bottom
+          "data-[state=closed]:slide-out-to-bottom-full data-[state=open]:slide-in-from-bottom-full",
+          // Десктоп анимация - zoom и slide
+          "sm:data-[state=closed]:slide-out-to-bottom-0 sm:data-[state=open]:slide-in-from-bottom-0",
+          "sm:data-[state=closed]:zoom-out-95 sm:data-[state=open]:zoom-in-95",
+          "sm:data-[state=closed]:slide-out-to-left-1/2 sm:data-[state=open]:slide-in-from-left-1/2",
+          "sm:data-[state=closed]:slide-out-to-top-[48%] sm:data-[state=open]:slide-in-from-top-[48%]",
+          // Dark mode
+          "dark:border-zinc-800 dark:bg-zinc-950",
           className
         )}
         {...props}
       >
         {children}
-        <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-white transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-zinc-950 focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-zinc-100 data-[state=open]:text-zinc-500 dark:ring-offset-zinc-950 dark:focus:ring-zinc-300 dark:data-[state=open]:bg-zinc-800 dark:data-[state=open]:text-zinc-400">
+        <DialogPrimitive.Close
+          className={cn(
+            "absolute right-4 top-4 z-10",
+            "flex h-8 w-8 items-center justify-center",
+            "rounded-full bg-zinc-100 text-zinc-500",
+            "opacity-80 transition-all duration-200",
+            "hover:opacity-100 hover:bg-zinc-200 hover:text-zinc-700",
+            "focus:outline-none focus:ring-2 focus:ring-zinc-400 focus:ring-offset-2",
+            "disabled:pointer-events-none",
+            "data-[state=open]:bg-zinc-100 data-[state=open]:text-zinc-500",
+            "dark:ring-offset-zinc-950 dark:focus:ring-zinc-300",
+            "dark:bg-zinc-800 dark:text-zinc-400",
+            "dark:hover:bg-zinc-700 dark:hover:text-zinc-200",
+            "dark:data-[state=open]:bg-zinc-800 dark:data-[state=open]:text-zinc-400"
+          )}
+        >
           <XIcon className="h-4 w-4" />
           <span className="sr-only">Закрыть</span>
         </DialogPrimitive.Close>
@@ -75,7 +115,11 @@ function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="dialog-header"
-      className={cn("flex flex-col space-y-1.5 text-center sm:text-left", className)}
+      className={cn(
+        "flex flex-col space-y-2 text-center sm:text-left",
+        "pr-8", // Space for close button
+        className
+      )}
       {...props}
     />
   )
@@ -85,7 +129,10 @@ function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="dialog-footer"
-      className={cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className)}
+      className={cn(
+        "flex flex-col-reverse gap-3 sm:flex-row sm:justify-end",
+        className
+      )}
       {...props}
     />
   )
@@ -98,7 +145,11 @@ function DialogTitle({
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"
-      className={cn("text-lg font-semibold leading-none tracking-tight", className)}
+      className={cn(
+        "text-xl font-semibold leading-tight tracking-tight text-zinc-900",
+        "dark:text-zinc-100",
+        className
+      )}
       {...props}
     />
   )
@@ -111,7 +162,11 @@ function DialogDescription({
   return (
     <DialogPrimitive.Description
       data-slot="dialog-description"
-      className={cn("text-sm text-zinc-500 dark:text-zinc-400", className)}
+      className={cn(
+        "text-sm text-zinc-500 leading-relaxed",
+        "dark:text-zinc-400",
+        className
+      )}
       {...props}
     />
   )
